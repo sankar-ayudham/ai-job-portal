@@ -1,0 +1,34 @@
+@import "tailwindcss";
+
+/* CRITICAL FIX: This tells Tailwind v4 to use our manual toggle button 
+  instead of forcing the computer's system preferences. 
+*/
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* NUKE ALL VITE DEFAULT CONSTRAINTS */
+#root {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-align: left !important;
+}
+
+html, body {
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden;
+  background-color: #ffffff;
+  transition: background-color 0.5s ease;
+}
+
+/* Ensure the absolute bottom of the page turns dark when toggled */
+html.dark body {
+  background-color: #0f172a; 
+}
