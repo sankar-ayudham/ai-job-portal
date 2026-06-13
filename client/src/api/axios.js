@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Create the base Axios instance
 const api = axios.create({
-    baseURL: 'https://ai-job-portal-awfc.onrender.com/api', 
+    baseURL: 'https://ai-job-portal-eexb.onrender.com/api', 
     withCredentials: true 
 });
 
