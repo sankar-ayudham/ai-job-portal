@@ -2,7 +2,7 @@ import axios from 'axios';
 
 // 1. Create the base Axios instance
 const api = axios.create({
-    baseURL: 'http://localhost:5000/api', // IMPORTANT: Ensure this matches your backend port!
+    baseURL: 'https://ai-job-portal-awfc.onrender.com/', // IMPORTANT: Ensure this matches your backend port!
     withCredentials: true 
 });
 
