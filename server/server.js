@@ -28,9 +28,12 @@ app.use(express.json());
 app.use(cookieParser()); // Required to read the JWT token from cookies
 
 // Required to allow the frontend to send credentials (cookies) to the backend
-app.use(cors({ 
-    origin: 'http://localhost:5173', 
-    credentials: true 
+app.use(cors({
+    origin: [
+        'http://localhost:5173', 
+        'https://ai-job-portal-xi.vercel.app'
+    ],
+    credentials: true
 }));
 
 // --- MOUNT ROUTES ---
