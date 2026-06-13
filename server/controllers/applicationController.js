@@ -3,63 +3,69 @@ import Job from '../models/Job.js';
 import catchAsync from '../utils/catchAsync.js';
 import ErrorResponse from '../utils/errorResponse.js';
 
+// @desc    Apply for a job
+// @route   POST /api/applications
 export const createApplication = catchAsync(async (req, res, next) => {
-    const { jobId, resumeUrl } = req.body;
-
-    if (!jobId || !resumeUrl) {
-        return next(new ErrorResponse('Job ID and Resume URL are required', 400));
+    // 1. Security Check: Ensure the user is logged in
+    if (!req.user || !req.user.id) {
+        return next(new ErrorResponse("Not authorized to apply. Please log in.", 401));
     }
 
-    const jobExists = await Job.findById(jobId);
-    if (!jobExists) {
-        return next(new ErrorResponse('Job not found', 404));
+    // 🚀 THE FIX: Prevent server crashes if the frontend forgets the job ID
+    if (!req.body.job) {
+        return next(new ErrorResponse("Job ID is required to submit an application.", 400));
     }
 
-    const existingApp = await Application.findOne({
-        job: jobId,
-        applicant: req.user._id
+    // 2. Force the applicant ID to be the securely logged-in user
+    req.body.applicant = req.user.id;
+
+    // 3. Prevent duplicate applications
+    const existingApplication = await Application.findOne({
+        job: req.body.job,
+        applicant: req.user.id
     });
 
-    if (existingApp) {
-        return res.status(400).json({ 
-            success: false, 
-            error: 'You have already applied for this job',
-            application: existingApp
-        });
+    if (existingApplication) {
+        return next(new ErrorResponse("You have already applied for this role", 400));
     }
 
-    const application = await Application.create({
-        job: jobId,
-        applicant: req.user._id,
-        resumeUrl,
-        status: 'Pending'
-    });
+    // 4. Save the application to the database
+    const application = await Application.create(req.body);
 
-    res.status(201).json({ success: true, data: application });
+    res.status(201).json({
+        success: true,
+        data: application
+    });
 });
 
+// @desc    Get logged-in user's applications
+// @route   GET /api/applications
 export const getMyApplications = catchAsync(async (req, res, next) => {
-    const applications = await Application.find({ applicant: req.user._id })
-        .populate('job', 'title company location')
+    if (!req.user || !req.user.id) {
+        return next(new ErrorResponse("Not authorized", 401));
+    }
+
+    const applications = await Application.find({ applicant: req.user.id })
+        .populate('job', 'title companyName location employmentType')
         .sort('-createdAt');
 
-    res.status(200).json({ success: true, count: applications.length, data: applications });
+    res.status(200).json({
+        success: true,
+        count: applications.length,
+        data: applications
+    });
 });
 
-// NEW: For Recruiters to see who applied to a specific job
-export const getJobApplicants = catchAsync(async (req, res, next) => {
-    const { jobId } = req.params;
-
-    // Verify the job exists
-    const job = await Job.findById(jobId);
-    if (!job) {
-        return next(new ErrorResponse('Job not found', 404));
-    }
-
-    // Find all applications for this job, populate user details, and sort by ATS score (Highest first!)
-    const applications = await Application.find({ job: jobId })
+// @desc    Get all applications for a specific job
+// @route   GET /api/applications/job/:jobId
+export const getJobApplications = catchAsync(async (req, res, next) => {
+    const applications = await Application.find({ job: req.params.jobId })
         .populate('applicant', 'name email')
-        .sort({ atsScore: -1 });
+        .sort('-createdAt');
 
-    res.status(200).json({ success: true, count: applications.length, data: applications });
+    res.status(200).json({
+        success: true,
+        count: applications.length,
+        data: applications
+    });
 });

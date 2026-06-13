@@ -1,20 +1,25 @@
 import express from 'express';
-import { getJobs, getJob, createJob } from '../controllers/jobController.js';
-import { protect, authorize } from '../middleware/authMiddleware.js';
+import { 
+    createJob, 
+    getJobs, 
+    getJob, 
+    getMyJobs 
+} from '../controllers/jobController.js'; 
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// @route   GET /api/jobs
-// @desc    Get all jobs (public, handles search & pagination)
-router.get('/', getJobs);
+// Public & Protected: Get all jobs / Create a new job
+router.route('/')
+    .get(getJobs)
+    .post(protect, createJob);
 
-// @route   GET /api/jobs/:id
-// @desc    Get single job details (public)
-router.get('/:id', getJob);
+// 🚀 CRITICAL ROUTE ORDER: /me must come before /:id
+router.route('/me')
+    .get(protect, getMyJobs);
 
-// @route   POST /api/jobs
-// @desc    Create a new job
-// @access  Protected: Only Recruiters can post jobs
-router.post('/', protect, authorize('Recruiter'), createJob);
+// Public: Get a single job by its ID
+router.route('/:id')
+    .get(getJob);
 
 export default router;

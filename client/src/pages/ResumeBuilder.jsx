@@ -8,6 +8,9 @@ export default function ResumeBuilder() {
         role: '',
         rawText: ''
     });
+    
+    // NEW: We store the finalized role here so it doesn't update while typing
+    const [generatedRole, setGeneratedRole] = useState('');
     const [isGenerating, setIsGenerating] = useState(false);
     const [optimizedBullets, setOptimizedBullets] = useState([]);
 
@@ -18,6 +21,10 @@ export default function ResumeBuilder() {
         try {
             const res = await api.post('/ai/optimize', formData);
             setOptimizedBullets(res.data.data);
+            
+            // NEW: Only update the right-side title AFTER the AI succeeds
+            setGeneratedRole(formData.role);
+            
             toast.success('Experience optimized for ATS!');
         } catch (err) {
             toast.error('Failed to generate optimized text.');
@@ -115,7 +122,8 @@ export default function ResumeBuilder() {
                             ) : (
                                 <div className="space-y-6">
                                     <div className="mb-2">
-                                        <h3 className="text-white font-bold text-lg">{formData.role || 'Software Engineer'}</h3>
+                                        {/* NEW: Reads from the frozen generatedRole state instead of the live formData */}
+                                        <h3 className="text-white font-bold text-lg">{generatedRole || 'Software Engineer'}</h3>
                                         <p className="text-slate-500 text-sm">Professional Experience</p>
                                     </div>
                                     <ul className="space-y-4 list-disc pl-5">

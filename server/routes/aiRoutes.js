@@ -4,10 +4,10 @@ import { protect } from '../middleware/authMiddleware.js';
 
 const router = express.Router();
 
-// Existing ATS Scanner Route
+// ATS Scanner Route (Keep this protected so only logged-in users can apply)
 router.post('/analyze-application/:id', protect, analyzeApplication);
 
-// NEW: Resume Text Optimizer Route
-router.post('/optimize', protect, optimizeResumeText);
+// Resume Text Optimizer Route (REMOVED 'protect' to make it a public tool)
+router.post('/optimize', optimizeResumeText);
 
 export default router;

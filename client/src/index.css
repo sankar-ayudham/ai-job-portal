@@ -1,9 +1,7 @@
 @import "tailwindcss";
 
-/* CRITICAL FIX: This tells Tailwind v4 to use our manual toggle button 
-  instead of forcing the computer's system preferences. 
-*/
-@custom-variant dark (&:is(.dark *));
+/* 🚀 THE v4 FIX: This forces Tailwind to listen to our ThemeToggle button */
+@custom-variant dark (&:where(.dark, .dark *));
 
 :root {
   font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
@@ -25,10 +23,10 @@ html, body {
   padding: 0;
   overflow-x: hidden;
   background-color: #ffffff;
-  transition: background-color 0.5s ease;
+  transition: background-color 0.3s ease;
 }
 
 /* Ensure the absolute bottom of the page turns dark when toggled */
 html.dark body {
-  background-color: #0f172a; 
+  background-color: #030712; /* Matched perfectly to your JobDetails background */
 }

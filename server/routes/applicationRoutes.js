@@ -1,14 +1,20 @@
 import express from 'express';
-import { createApplication, getMyApplications, getJobApplicants } from '../controllers/applicationController.js';
-import { protect, authorize } from '../middleware/authMiddleware.js';
+import { 
+    createApplication, 
+    getMyApplications, 
+    getJobApplications 
+} from '../controllers/applicationController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
-// Candidate Routes
-router.get('/me', protect, authorize('Candidate'), getMyApplications);
-router.post('/', protect, authorize('Candidate'), createApplication);
+// 🚀 PROTECTED: Candidates applying for jobs and viewing their own applications
+router.route('/')
+    .post(protect, createApplication)
+    .get(protect, getMyApplications);
 
-// Recruiter Routes (Get applicants for a specific job)
-router.get('/job/:jobId', protect, authorize('Recruiter'), getJobApplicants);
+// 🚀 PROTECTED: Recruiters viewing applications for a specific job they posted
+router.route('/job/:jobId')
+    .get(protect, getJobApplications);
 
 export default router;

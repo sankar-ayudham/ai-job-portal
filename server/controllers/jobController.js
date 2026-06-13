@@ -1,6 +1,7 @@
 import Job from '../models/Job.js';
 import catchAsync from '../utils/catchAsync.js';
 import ErrorResponse from '../utils/errorResponse.js';
+import Application from '../models/Application.js';
 
 // @desc    Get all jobs (with advanced search, filter, and pagination)
 // @route   GET /api/jobs
@@ -80,4 +81,37 @@ export const createJob = catchAsync(async (req, res, next) => {
     const job = await Job.create(req.body);
 
     res.status(201).json({ success: true, data: job });
+});
+
+// @desc    Get recruiter dashboard data (My Jobs + Applications sorted by AI Score)
+// @route   GET /api/jobs/recruiter/dashboard
+// @access  Private (Recruiter)
+export const getRecruiterDashboard = catchAsync(async (req, res, next) => {
+    // 1. Find all jobs posted by the logged-in recruiter
+    const jobs = await Job.find({ postedBy: req.user.id }).sort('-createdAt').lean();
+
+    // 2. For each job, find all applications and attach them (sorted by best ATS score first)
+    const dashboardData = await Promise.all(jobs.map(async (job) => {
+        const applications = await Application.find({ job: job._id })
+            .populate('user', 'name email') // Optional: populate if you linked users to applications
+            .sort({ atsScore: -1 }) // AI Magic: Best matches at the top!
+            .lean();
+            
+        return {
+            ...job,
+            applicationCount: applications.length,
+            applications
+        };
+    }));
+
+    res.status(200).json({ success: true, data: dashboardData });
+});
+export const getMyJobs = catchAsync(async (req, res, next) => {
+    const jobs = await Job.find({ postedBy: req.user.id }).sort('-createdAt');
+
+    res.status(200).json({
+        success: true,
+        count: jobs.length,
+        data: jobs
+    });
 });

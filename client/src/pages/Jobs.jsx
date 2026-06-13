@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Search, MapPin, Building2, Briefcase, DollarSign, Filter, Loader2, ChevronLeft, ChevronRight, Clock, Check } from 'lucide-react';
+import { Search, MapPin, Building2, Briefcase, IndianRupee, Filter, Loader2, ChevronLeft, ChevronRight, Clock, Check } from 'lucide-react';
 import api from '../api/axios';
 
 export default function Jobs() {
@@ -13,7 +13,7 @@ export default function Jobs() {
     const [totalPages, setTotalPages] = useState(1);
     const [totalJobs, setTotalJobs] = useState(0);
     
-    // NEW: Multi-select filter state
+    // Multi-select filter state
     const [selectedTypes, setSelectedTypes] = useState([]);
 
     // Fetch jobs whenever page, keyword, or filters change
@@ -55,12 +55,19 @@ export default function Jobs() {
         setPage(1); // Always reset to page 1 when changing filters
     };
 
-    // Formatting helper
+    // Formatting helper for time
     const timeAgo = (dateString) => {
         const days = Math.floor((new Date() - new Date(dateString)) / (1000 * 60 * 60 * 24));
         if (days === 0) return 'Today';
         if (days === 1) return 'Yesterday';
         return `${days} days ago`;
+    };
+
+    // Formatting helper for Indian Rupee
+    const formatSalary = (amount) => {
+        return new Intl.NumberFormat('en-IN', {
+            maximumFractionDigits: 0
+        }).format(amount);
     };
 
     return (
@@ -194,8 +201,8 @@ export default function Jobs() {
                                             <div className="flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-start gap-4">
                                                 {job.salary?.min > 0 && (
                                                     <span className="text-lg font-black text-emerald-600 dark:text-emerald-400 flex items-center">
-                                                        <DollarSign className="w-5 h-5 -mr-1" />
-                                                        {job.salary.min.toLocaleString()} - {job.salary.max.toLocaleString()}
+                                                        <IndianRupee className="w-5 h-5 -mr-1" />
+                                                        {formatSalary(job.salary.min)} - {formatSalary(job.salary.max)}
                                                     </span>
                                                 )}
                                                 <span className="text-xs font-bold text-slate-400 dark:text-slate-500 flex items-center gap-1 uppercase tracking-wider">

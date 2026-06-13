@@ -6,31 +6,32 @@ const applicationSchema = new mongoose.Schema({
         ref: 'Job',
         required: true
     },
-    applicant: {
+    applicant: { 
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true
     },
     resumeUrl: {
         type: String,
-        required: true
+        required: [true, 'Please provide a resume URL']
     },
+    atsScore: { type: Number, default: 0 },
+    aiAnalysis: { type: Object, default: {} },
     status: {
         type: String,
-        enum: ['Pending', 'Reviewed', 'Interviewing', 'Rejected', 'Accepted'],
+        enum: ['Pending', 'Reviewed', 'Rejected', 'Accepted'],
         default: 'Pending'
-    },
-    atsScore: {
-        type: Number,
-        default: 0
-    },
-    aiAnalysis: {
-        type: Object,
-        default: null
     }
 }, { timestamps: true });
 
-// DB Level protection against duplicate applications
-applicationSchema.index({ job: 1, applicant: 1 }, { unique: true });
+// 1. Create the CORRECT unique index so a user can't apply to the same job twice
+applicationSchema.index({ applicant: 1, job: 1 }, { unique: true });
 
-export default mongoose.model('Application', applicationSchema);
+const Application = mongoose.model('Application', applicationSchema);
+
+// 2. THE GHOST BUSTER: This tells MongoDB to silently delete the old, broken index
+Application.collection.dropIndex('candidate_1_job_1').catch(() => {
+    // We catch the error silently so it doesn't clutter your console if the index is already gone
+});
+
+export default Application;

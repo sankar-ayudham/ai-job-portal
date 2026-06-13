@@ -9,20 +9,57 @@ import JobDetail from './pages/JobDetail';
 import Dashboard from './pages/Dashboard';
 import RecruiterDashboard from './pages/RecruiterDashboard';
 import ResumeBuilder from './pages/ResumeBuilder';
+import CreateJob from './pages/CreateJob';
+import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
     return (
         <Routes>
             <Route path="/" element={<MainLayout />}>
+                {/* 🟢 Public Routes (Anyone can access) */}
                 <Route index element={<Home />} />
                 <Route path="register" element={<Register />} />
                 <Route path="login" element={<Login />} />
                 <Route path="jobs" element={<Jobs />} /> 
                 <Route path="jobs/:id" element={<JobDetail />} />
-                <Route path="/dashboard" element={<Dashboard />} />
-                <Route path="/recruiter-dashboard" element={<RecruiterDashboard />} />
-                <Route path="/resume-builder" element={<ResumeBuilder />} />
                 
+                {/* 🟡 Protected Routes (Logged-in Users & Candidates) */}
+                <Route 
+                    path="/dashboard" 
+                    element={
+                        <ProtectedRoute>
+                            <Dashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/resume-builder" 
+                    element={
+                        <ProtectedRoute>
+                            <ResumeBuilder />
+                        </ProtectedRoute>
+                    } 
+                />
+                
+                {/* 🔴 Strictly Protected Routes (Recruiters Only) */}
+                <Route 
+                    path="/recruiter-dashboard" 
+                    element={
+                        <ProtectedRoute allowedRoles={['Recruiter']}>
+                            <RecruiterDashboard />
+                        </ProtectedRoute>
+                    } 
+                />
+                <Route 
+                    path="/create-job" 
+                    element={
+                        <ProtectedRoute allowedRoles={['Recruiter']}>
+                            <CreateJob />
+                        </ProtectedRoute>
+                    } 
+                />
+                
+                {/* 404 Catch-All Route */}
                 <Route path="*" element={
                     <div className="flex items-center justify-center min-h-[60vh] text-center px-4">
                         <div>

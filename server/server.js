@@ -3,6 +3,8 @@ import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import mongoose from 'mongoose';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
 dotenv.config();
 
@@ -16,7 +18,10 @@ import uploadRoutes from './routes/uploadRoutes.js';
 
 
 
+
 const app = express();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+dotenv.config({ path: path.join(__dirname, './.env') });
 
 // --- CRITICAL MIDDLEWARE ---
 app.use(express.json());
