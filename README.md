@@ -1,6 +1,6 @@
 # 🚀 AI Job Portal & ATS Analyzer
 
-![Project Banner](./placeholders/banner.png)
+Live Demo: https://ai-job-portal-xi.vercel.app 
 
 ## 📖 Overview
 The **AI Job Portal** is a full-stack MERN application designed to modernize the hiring process. It bridges the gap between recruiters and candidates by utilizing **Generative AI (LLMs)** to provide real-time Applicant Tracking System (ATS) scoring, resume optimization, and automated candidate ranking. 
